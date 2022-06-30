@@ -1,12 +1,21 @@
 ﻿using System;
+using SoftUni.Data;
+using SoftUni.Models;
+using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
-namespace Database_First
+namespace SoftUni
 {
-    internal class Program
+    public class StartUp
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+               
         }
+
+        
     }
 }
