@@ -288,7 +288,21 @@ namespace SoftUni
 
         }
         //13
+        public static string GetEmployeesByFirstNameStartingWithSa(SoftUniContext context)
+        {
 
+
+            var employees = context.Employees.Where(x => EF.Functions.Like(x.FirstName, "sa%")).Select(x => new { x.FirstName, x.LastName, x.JobTitle, x.Salary }).ToList();
+            var sb = new StringBuilder();
+            foreach (var item in employees)
+            {
+                sb.AppendLine($"{item.FirstName} {item.LastName} - {item.JobTitle} - (${item.Salary:F2})");
+            }
+
+
+
+            return sb.ToString().TrimEnd();
+        }
         //14
 
         //15
