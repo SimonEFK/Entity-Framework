@@ -39,6 +39,18 @@ namespace SoftUni
 
         }
 
+        //04
+        public static string GetEmployeesWithSalaryOver50000(SoftUniContext context)
+        {
+
+            var sb = new StringBuilder();
+            var employees = context.Employees.Where(x => x.Salary > 50_000).Select(x => new { x.FirstName, x.Salary }).ToList();
+            foreach (var item in employees.OrderBy(x => x.FirstName))
+            {
+                sb.AppendLine($"{item.FirstName} - {item.Salary:f2}");
+            }
+            return sb.ToString().TrimEnd();
+        }
 
     }
 }
