@@ -240,7 +240,28 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
         }
         //11
+        public static string GetLatestProjects(SoftUniContext context)
+        {
 
+            var sb = new StringBuilder();
+            var projects = context.Projects.Select(x => new { x.Name, x.Description, x.StartDate })
+                .OrderByDescending(x => x.StartDate)
+                .Take(10)
+                .ToList();
+
+
+
+            foreach (var item in projects.OrderBy(x => x.Name))
+            {
+
+                sb.AppendLine($"{item.Name}");
+                sb.AppendLine($"{item.Description}");
+                sb.AppendLine($"{item.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)}");
+
+            }
+            return sb.ToString().TrimEnd();
+
+        }
         //12
 
         //13
