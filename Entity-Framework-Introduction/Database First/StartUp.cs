@@ -52,5 +52,19 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
         }
 
+        //05
+        public static string GetEmployeesFromResearchAndDevelopment(SoftUniContext context)
+        {
+            var sb = new StringBuilder();
+
+            var employees = context.Employees.Where(x => x.Department.Name.Equals("Research and Development")).Select(x => new { x.FirstName, x.LastName, x.Salary, depName = x.Department.Name }).ToList().OrderBy(x => x.Salary).ThenByDescending(x => x.FirstName);
+
+            foreach (var item in employees)
+            {
+                sb.AppendLine($"{item.FirstName} {item.LastName} from {item.depName} - ${item.Salary:F2}");
+            }
+            return sb.ToString().TrimEnd();
+
+        }
     }
 }
