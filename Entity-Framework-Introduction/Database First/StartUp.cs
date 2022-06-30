@@ -330,6 +330,33 @@ namespace SoftUni
 
         }
         //15
+        public static string RemoveTown(SoftUniContext context)
+        {
 
+            var townToRemove = context.Towns.Include(x => x.Addresses).FirstOrDefault(x => x.Name == "Seattle");
+            var allAddressesIds = townToRemove.Addresses.Select(x => x.AddressId).ToList();
+
+
+            var employeesToSetAddressToNull = context.Employees.Where(x => (x.AddressId.HasValue == true) && (allAddressesIds.Contains(x.AddressId.Value))).ToList();
+
+            foreach (var employee in employeesToSetAddressToNull)
+            {
+                employee.AddressId = null;
+            }
+
+            foreach (var item in allAddressesIds)
+            {
+                var address = context.Addresses.FirstOrDefault(x => x.AddressId == item);
+                context.Addresses.Remove(address);
+            }
+
+            context.Towns.Remove(townToRemove);
+            context.SaveChanges();
+            return $"{allAddressesIds.Count} addresses in Seattle were deleted";
+
+
+
+
+        }
     }
 }
