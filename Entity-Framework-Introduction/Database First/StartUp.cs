@@ -66,5 +66,50 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
 
         }
+
+        //06
+        public static string AddNewAddressToEmployee(SoftUniContext context)
+        {
+            var sb = new StringBuilder();
+            var newAddress = new Address
+            {
+                AddressText = "Vitoshka 15",
+                TownId = 4
+            };
+
+            context.Addresses.Add(newAddress);
+            context.SaveChanges();
+
+            var nakov = context.Employees.FirstOrDefault(x => x.LastName == "Nakov");
+            nakov.AddressId = newAddress.AddressId;
+
+            context.SaveChanges();
+
+            var employeesAddresses = context.Employees.Select(x => new { x.Address.AddressId, x.Address.AddressText }).ToList().OrderByDescending(x => x.AddressId).Take(10);
+            foreach (var item in employeesAddresses)
+            {
+                sb.AppendLine($"{item.AddressText}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+        //07
+
+        //08
+
+        //09
+
+        //10
+
+        //11
+
+        //12
+
+        //13
+
+        //14
+
+        //15
+
     }
 }
