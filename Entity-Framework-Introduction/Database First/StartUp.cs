@@ -94,7 +94,53 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
         }
         //07
+        public static string GetEmployeesInPeriod(SoftUniContext context)
+        {
 
+            var sb = new StringBuilder();
+
+            var employess = context.Employees
+                .Include(x => x.EmployeesProjects)
+                .ThenInclude(x => x.Project)
+                .Where(x => x.EmployeesProjects.Any(y => y.Project.StartDate.Year >= 2001 && y.Project.StartDate.Year <= 2003))
+                .Select(x => new
+                {
+                    x.FirstName,
+                    x.LastName,
+                    ManagerFirstName = x.Manager.FirstName,
+                    ManagerLastName = x.Manager.LastName,
+                    Projects = x.EmployeesProjects.Select(y => new
+                        {
+                            ProjectName = y.Project.Name,
+                            StartDate = y.Project.StartDate,
+                            EndDate = y.Project.EndDate
+                        }
+                    )
+                })
+                .Take(10)
+                .ToList();
+
+
+
+            foreach (var item in employess)
+            {
+                sb.AppendLine($"{item.FirstName} {item.LastName} - Manager: {item.ManagerFirstName} {item.ManagerLastName}");
+
+                foreach (var emproject in item.Projects)
+                {
+                    var endDate = (emproject.EndDate.HasValue == true) ? emproject.EndDate.Value.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture) : "not finished";
+                    var startDate = (emproject.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture));
+
+
+
+
+                    sb.AppendLine($"--{emproject.ProjectName} - {startDate} - {endDate}");
+                }
+            }
+
+            return sb.ToString().TrimEnd();
+
+        }
         //08
 
         //09
