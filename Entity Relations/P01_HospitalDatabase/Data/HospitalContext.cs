@@ -23,6 +23,7 @@ namespace P01_HospitalDatabase.Data
         public DbSet<Patient> Patients { get; set; }
         public DbSet<PatientMedicament> PatientMedicaments { get; set; }
         public DbSet<Visitation> Visitations { get; set; }
+        public DbSet<Doctor> Doctors { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (optionsBuilder.IsConfigured==false)
@@ -42,6 +43,7 @@ namespace P01_HospitalDatabase.Data
             modelBuilder.ApplyConfiguration(new PatientConfiguration());
             modelBuilder.ApplyConfiguration(new PatientMedicamentConfiguration());
             modelBuilder.ApplyConfiguration(new VisitationConfiguration());
+            modelBuilder.ApplyConfiguration(new DoctorConfiguration());
 
 
 
