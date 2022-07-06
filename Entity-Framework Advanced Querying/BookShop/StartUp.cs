@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
 using BookShop.Models.Enums;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 
 namespace BookShop
@@ -23,45 +18,47 @@ namespace BookShop
             using var db = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
 
-            string inpuLine = Console.ReadLine();
-            var result = GetBookTitlesContaining(db, inpuLine);
+            var inpuLine = Console.ReadLine();
+            var result = GetBooksByAuthor(db, inpuLine);
             Console.WriteLine(result);
 
 
         }
 
-
-
-
-        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        public static string GetBooksByAuthor(BookShopContext context, string input)
         {
-            string pattern = $"%{input}%";
+            var pattern = $"{input}%";
+            var books = context.Books.Where(x => EF.Functions.Like(x.Author.LastName, pattern))
+                .Select(x => new
+                {
+                    x.BookId,
+                    x.Author.FirstName,
+                    x.Author.LastName,
+                    x.Title
 
-            var books = context.Books.Where(x=>EF.Functions.Like(x.Title,pattern)).Select(x=>new
-            {
-                x.Title
-            }).ToList().OrderBy(x=>x.Title);
+                })
+                .ToList()
+                .OrderBy(x => x.BookId);
 
-            return string.Join(Environment.NewLine, books.Select(x => x.Title));
-
+            return string.Join(Environment.NewLine, books.Select(x => $"{x.Title} ({x.FirstName} {x.LastName})"));
 
         }
 
+        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        {
+            var pattern = $"%{input}%";
 
+            var books = context.Books.Where(x => EF.Functions.Like(x.Title, pattern)).Select(x => new
+            {
+                x.Title
+            }).ToList().OrderBy(x => x.Title);
 
+            return string.Join(Environment.NewLine, books.Select(x => x.Title));
 
-
-
-
-
-
-
-
-
+        }
         public static string GetAuthorNamesEndingIn(BookShopContext context, string input)
         {
 
-            var firstNameLastLetters = input;
             var authors = context.Authors
                 .Where(x => x.FirstName.EndsWith(input))
                 .Select(x => new { x.FirstName, x.LastName })
@@ -69,28 +66,7 @@ namespace BookShop
                 .OrderBy(x => (x.FirstName + ' ' + x.LastName));
 
             return string.Join(Environment.NewLine, authors.Select(x => $"{x.FirstName} {x.LastName}"));
-
-
-
-
-
-
-
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public static string GetBooksReleasedBefore(BookShopContext context, string date)
         {
             var maxDate = DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture);
@@ -114,9 +90,6 @@ namespace BookShop
             return sb.ToString().TrimEnd();
 
         }
-
-
-
         public static string GetBooksByCategory(BookShopContext context, string input)
         {
             var bookCategories = input.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToUpper());
@@ -133,28 +106,12 @@ namespace BookShop
                 .OrderBy(x => x.Title)
                 .ToList();
 
-            var sb = new StringBuilder();
-
+           
 
             return string.Join(Environment.NewLine, books.Select(x => x.Title));
 
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public static string GetBooksNotReleasedIn(BookShopContext context, int year)
         {
 
@@ -169,21 +126,9 @@ namespace BookShop
 
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
         public static string GetBooksByPrice(BookShopContext context)
         {
-            decimal bookMinPrice = 40M;
+            var bookMinPrice = 40M;
 
             var books = context.Books
                 .Where(x => x.Price > bookMinPrice)
@@ -203,10 +148,9 @@ namespace BookShop
 
             return sb.ToString().TrimEnd();
         }
-
         public static string GetGoldenBooks(BookShopContext context)
         {
-            int bookCopies = 5000;
+            var bookCopies = 5000;
 
             var books = context.Books
                 .Where(x => x.EditionType == EditionType.Gold && x.Copies < bookCopies)
@@ -227,7 +171,6 @@ namespace BookShop
 
             return sb.ToString().TrimEnd();
         }
-
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
         {
             var ageGroup = Enum.Parse<AgeRestriction>(command, true);
