@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using BookShop.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace BookShop
@@ -17,12 +19,50 @@ namespace BookShop
             using var db = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
 
-            int inpuLine = int.Parse(Console.ReadLine());
-            var result = GetBooksNotReleasedIn(db, inpuLine);
+            string inpuLine = Console.ReadLine();
+            var result = GetBooksByCategory(db, inpuLine);
             Console.WriteLine(result);
 
 
         }
+
+
+        public static string GetBooksByCategory(BookShopContext context, string input)
+        {
+            var bookCategories = input.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToUpper());
+
+
+            var books = context.Books
+                .Where(x => x.BookCategories.Any(y => bookCategories.Contains(y.Category.Name.ToUpper()) == true))
+                .Select(x => new
+                {
+                    x.Title,
+                    categoryName = x.BookCategories.Select(y => new { y.Category.Name })
+
+                })
+                .OrderBy(x => x.Title)
+                .ToList();
+
+            var sb = new StringBuilder();
+
+
+            return string.Join(Environment.NewLine, books.Select(x => x.Title));
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         public static string GetBooksNotReleasedIn(BookShopContext context, int year)
