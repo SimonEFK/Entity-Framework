@@ -17,11 +17,38 @@ namespace BookShop
             //DbInitializer.ResetDatabase(db);
             
             //string inpuLine = Console.ReadLine();
-            var result = GetGoldenBooks(db);
+            var result = GetBooksByPrice(db);
             Console.WriteLine(result);
 
 
         }
+
+
+
+        public static string GetBooksByPrice(BookShopContext context)
+        {
+            decimal bookMinPrice = 40M;
+
+            var books = context.Books
+                .Where(x=>x.Price>bookMinPrice)
+                .Select(x=>new
+                {
+                    x.Title,
+                    x.Price
+                })
+                .OrderByDescending(x=>x.Price)
+                .ToList();
+
+            var sb = new StringBuilder();
+            foreach (var book in books)
+            {
+                sb.AppendLine($"{book.Title} - ${book.Price:F2}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+
 
 
         public static string GetGoldenBooks(BookShopContext context)
