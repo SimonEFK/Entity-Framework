@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using BookShop.Models.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 
 namespace BookShop
@@ -23,11 +24,71 @@ namespace BookShop
             //DbInitializer.ResetDatabase(db);
 
             string inpuLine = Console.ReadLine();
-            var result = GetBooksReleasedBefore(db, inpuLine);
+            var result = GetBookTitlesContaining(db, inpuLine);
             Console.WriteLine(result);
 
 
         }
+
+
+
+
+        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        {
+            string pattern = $"%{input}%";
+
+            var books = context.Books.Where(x=>EF.Functions.Like(x.Title,pattern)).Select(x=>new
+            {
+                x.Title
+            }).ToList().OrderBy(x=>x.Title);
+
+            return string.Join(Environment.NewLine, books.Select(x => x.Title));
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        public static string GetAuthorNamesEndingIn(BookShopContext context, string input)
+        {
+
+            var firstNameLastLetters = input;
+            var authors = context.Authors
+                .Where(x => x.FirstName.EndsWith(input))
+                .Select(x => new { x.FirstName, x.LastName })
+                .ToList()
+                .OrderBy(x => (x.FirstName + ' ' + x.LastName));
+
+            return string.Join(Environment.NewLine, authors.Select(x => $"{x.FirstName} {x.LastName}"));
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         public static string GetBooksReleasedBefore(BookShopContext context, string date)
