@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using BookShop.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,11 +23,37 @@ namespace BookShop
             //DbInitializer.ResetDatabase(db);
 
             string inpuLine = Console.ReadLine();
-            var result = GetBooksByCategory(db, inpuLine);
+            var result = GetBooksReleasedBefore(db, inpuLine);
             Console.WriteLine(result);
 
 
         }
+
+
+        public static string GetBooksReleasedBefore(BookShopContext context, string date)
+        {
+            var maxDate = DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var books = context.Books.Where(x => x.ReleaseDate.Value < maxDate).Select(x => new
+            {
+                bookName = x.Title,
+                bookEdition = x.EditionType.ToString(),
+                bookPrice = x.Price,
+                bookReleaseDate = x.ReleaseDate.Value,
+            })
+                .ToList()
+                .OrderByDescending(x => x.bookReleaseDate);
+
+            var sb = new StringBuilder();
+            foreach (var book in books)
+            {
+                sb.AppendLine(
+                    $"{book.bookName} - {book.bookEdition} - ${book.bookPrice:F2}");//{book.bookReleaseDate}");
+            }
+
+            return sb.ToString().TrimEnd();
+
+        }
+
 
 
         public static string GetBooksByCategory(BookShopContext context, string input)
