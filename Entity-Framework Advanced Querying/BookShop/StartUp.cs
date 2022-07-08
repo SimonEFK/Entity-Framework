@@ -16,11 +16,6 @@ namespace BookShop
         public static void Main()
         {
             using var db = new BookShopContext();
-            //DbInitializer.ResetDatabase(db);
-
-            //var inpuLine = Console.ReadLine();
-            var result = GetTotalProfitByCategory(db);
-            Console.WriteLine(result);
 
 
         }
@@ -30,18 +25,50 @@ namespace BookShop
 
 
 
+
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+
+            var categories = context.Categories
+                .Select(x => new
+                {
+
+                    x.Name,
+                    top3MostRecentBooks = x.CategoryBooks.Select(y => new
+                    {
+                        bookName = y.Book.Title,
+                        bookReleaseDate = y.Book.ReleaseDate
+                    })
+                    .OrderByDescending(book => book.bookReleaseDate)
+                    .Take(3)
+
+                })
+                .ToList()
+                .OrderBy(x => x.Name);
+
+            var sb = new StringBuilder();
+            foreach (var category in categories)
+            {
+                sb.AppendLine($"--{category.Name}");
+                foreach (var book in category.top3MostRecentBooks)
+                {
+                    sb.AppendLine($"{book.bookName} ({book.bookReleaseDate.Value.Year})");
+                }
+            }
+            return sb.ToString().TrimEnd();
+        }
         public static string GetTotalProfitByCategory(BookShopContext context)
         {
 
-            var categories = context.Categories.Select(x=>new
+            var categories = context.Categories.Select(x => new
             {
                 x.Name,
-                totalProfit = x.CategoryBooks.Sum(y=>y.Book.Price*y.Book.Copies)
+                totalProfit = x.CategoryBooks.Sum(y => y.Book.Price * y.Book.Copies)
 
             })
                 .ToList()
-                .OrderByDescending(x=>x.totalProfit)
-                .ThenBy(category=>category.Name);
+                .OrderByDescending(x => x.totalProfit)
+                .ThenBy(category => category.Name);
 
             return string.Join(Environment.NewLine, categories.Select(x => $"{x.Name} ${x.totalProfit:F2}"));
 
