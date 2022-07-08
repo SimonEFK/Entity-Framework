@@ -15,15 +15,18 @@ namespace BookShop
     {
         public static void Main()
         {
-            using var db = new BookShopContext();
-
-
+            
         }
 
+        public static int RemoveBooks(BookShopContext context)
+        {
 
+            var booksToRemove = context.Books.Where(x => x.Copies < 4200).ToList();
 
-
-
+            context.Books.RemoveRange(booksToRemove);
+            context.SaveChanges();
+            return booksToRemove.Count;
+        }
         public static void IncreasePrices(BookShopContext context)
         {
             var maximumYear = 2010;
