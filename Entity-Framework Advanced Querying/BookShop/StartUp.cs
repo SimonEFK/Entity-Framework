@@ -18,6 +18,7 @@ namespace BookShop
             
         }
 
+        //15
         public static int RemoveBooks(BookShopContext context)
         {
 
@@ -27,6 +28,7 @@ namespace BookShop
             context.SaveChanges();
             return booksToRemove.Count;
         }
+        //14
         public static void IncreasePrices(BookShopContext context)
         {
             var maximumYear = 2010;
@@ -40,6 +42,7 @@ namespace BookShop
             context.SaveChanges();
 
         }
+        //13
         public static string GetMostRecentBooks(BookShopContext context)
         {
 
@@ -71,6 +74,7 @@ namespace BookShop
             }
             return sb.ToString().TrimEnd();
         }
+        //12
         public static string GetTotalProfitByCategory(BookShopContext context)
         {
 
@@ -88,6 +92,7 @@ namespace BookShop
 
 
         }
+        //11
         public static string CountCopiesByAuthor(BookShopContext context)
         {
 
@@ -105,8 +110,10 @@ namespace BookShop
 
 
         }
+        //10
         public static int CountBooks(BookShopContext context, int lengthCheck)
             => context.Books.Where(x => x.Title.Length > lengthCheck).ToList().Count();
+        //09
         public static string GetBooksByAuthor(BookShopContext context, string input)
         {
             var pattern = $"{input}%";
@@ -125,6 +132,7 @@ namespace BookShop
             return string.Join(Environment.NewLine, books.Select(x => $"{x.Title} ({x.FirstName} {x.LastName})"));
 
         }
+        //08
         public static string GetBookTitlesContaining(BookShopContext context, string input)
         {
             var pattern = $"%{input}%";
@@ -137,6 +145,7 @@ namespace BookShop
             return string.Join(Environment.NewLine, books.Select(x => x.Title));
 
         }
+        //07
         public static string GetAuthorNamesEndingIn(BookShopContext context, string input)
         {
 
@@ -148,6 +157,7 @@ namespace BookShop
 
             return string.Join(Environment.NewLine, authors.Select(x => $"{x.FirstName} {x.LastName}"));
         }
+        //06
         public static string GetBooksReleasedBefore(BookShopContext context, string date)
         {
             var maxDate = DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture);
@@ -171,6 +181,7 @@ namespace BookShop
             return sb.ToString().TrimEnd();
 
         }
+        //05
         public static string GetBooksByCategory(BookShopContext context, string input)
         {
             var bookCategories = input.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToUpper());
@@ -193,6 +204,7 @@ namespace BookShop
 
 
         }
+        //04
         public static string GetBooksNotReleasedIn(BookShopContext context, int year)
         {
 
@@ -207,6 +219,7 @@ namespace BookShop
 
 
         }
+        //03
         public static string GetBooksByPrice(BookShopContext context)
         {
             var bookMinPrice = 40M;
@@ -229,6 +242,7 @@ namespace BookShop
 
             return sb.ToString().TrimEnd();
         }
+        //02
         public static string GetGoldenBooks(BookShopContext context)
         {
             var bookCopies = 5000;
@@ -252,6 +266,7 @@ namespace BookShop
 
             return sb.ToString().TrimEnd();
         }
+        //01
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
         {
             var ageGroup = Enum.Parse<AgeRestriction>(command, true);
