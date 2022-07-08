@@ -24,8 +24,19 @@ namespace BookShop
 
 
 
+        public static void IncreasePrices(BookShopContext context)
+        {
+            var maximumYear = 2010;
 
+            var books = context.Books.Where(x => x.ReleaseDate.Value.Year < maximumYear);
+            foreach (var book in books)
+            {
+                book.Price += 5;
+            }
 
+            context.SaveChanges();
+
+        }
         public static string GetMostRecentBooks(BookShopContext context)
         {
 
