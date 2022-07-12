@@ -19,13 +19,32 @@ namespace ProductShop
             ResetDatabase(pShopContext);
 
             var usersJson = File.ReadAllText(@"../../../Datasets/users.json");
-            var result = ImportUsers(pShopContext, usersJson);
-            Console.WriteLine(result);
+            Console.WriteLine(ImportUsers(pShopContext, usersJson));
+            var productJson = File.ReadAllText(@"../../../Datasets/products.json");
+            Console.WriteLine(ImportProducts(pShopContext, productJson));
+            var categoriesJson = File.ReadAllText(@"../../../Datasets/categories.json");
+
+            
+            Console.WriteLine("");
         }
 
-     
 
 
+        //02
+        public static string ImportProducts(ProductShopContext context, string inputJson)
+        {
+            var mapper = initializeMapper();
+            var productsDeserialized = JsonConvert.DeserializeObject<IEnumerable<ProductInputModel>>(inputJson);
+            var products = mapper.Map<IEnumerable<Product>>(productsDeserialized);
+            context.Products.AddRange(products);
+            context.SaveChanges();
+            ;
+
+            return $"Successfully imported {products.Count()}";
+        }
+
+
+        //01
         public static string ImportUsers(ProductShopContext context, string inputJson)
         {
             var mapper = initializeMapper();
@@ -34,8 +53,12 @@ namespace ProductShop
             context.Users.AddRange(users);
             context.SaveChanges();
 
-             return $"Successfully imported {users.Count()}";
+            return $"Successfully imported {users.Count()}";
         }
+
+
+
+        //miscellaneous
         private static IMapper initializeMapper()
         {
             var config = new MapperConfiguration(cfg =>
