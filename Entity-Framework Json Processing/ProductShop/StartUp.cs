@@ -33,10 +33,34 @@ namespace ProductShop
             //Console.WriteLine($"category-products imported: {ImportCategoryProducts(pShopContext,categoryProductsJson)}");
 
             //Console.WriteLine(GetProductsInRange(pShopContext));
-            Console.WriteLine(GetSoldProducts(pShopContext));
+            //Console.WriteLine(GetSoldProducts(pShopContext));
+           // Console.WriteLine(GetCategoriesByProductsCount(pShopContext));
+
+
 
         }
 
+        //07
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var categories = context.Categories
+                .Select(c => new
+                {
+                    category = c.Name,
+                    productsCount = c.CategoryProducts.Count(),
+                    averagePrice = c.CategoryProducts.Average(x=>x.Product.Price).ToString("F2"),
+                    totalRevenue = c.CategoryProducts.Sum(x=>x.Product.Price).ToString("F2")
+
+
+
+                })
+                .OrderByDescending(x => x.productsCount)
+                .ToList();
+            var categoriesJson = JsonConvert.SerializeObject(categories,Formatting.Indented);
+            return categoriesJson;
+
+
+        }
 
         //06
         public static string GetSoldProducts(ProductShopContext context)
