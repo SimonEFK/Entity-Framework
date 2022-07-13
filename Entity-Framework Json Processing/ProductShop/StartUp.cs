@@ -16,26 +16,52 @@ namespace ProductShop
         {
 
             var pShopContext = new ProductShopContext();
-           // ResetDatabase(pShopContext);
+            // ResetDatabase(pShopContext);
 
 
 
-           //var usersJson = File.ReadAllText(@"../../../Datasets/users.json");
-           //Console.WriteLine($"Users imported: {ImportUsers(pShopContext,usersJson)}");
+            //var usersJson = File.ReadAllText(@"../../../Datasets/users.json");
+            //Console.WriteLine($"Users imported: {ImportUsers(pShopContext,usersJson)}");
 
-           //var productJson = File.ReadAllText(@"../../../Datasets/products.json");
-           //Console.WriteLine($"Products imported: {ImportProducts(pShopContext, productJson)}");
+            //var productJson = File.ReadAllText(@"../../../Datasets/products.json");
+            //Console.WriteLine($"Products imported: {ImportProducts(pShopContext, productJson)}");
 
-           //var categoriesJson = File.ReadAllText(@"../../../Datasets/categories.json");
-           //Console.WriteLine($"Categories imported: {ImportCategories(pShopContext,categoriesJson)}");
+            //var categoriesJson = File.ReadAllText(@"../../../Datasets/categories.json");
+            //Console.WriteLine($"Categories imported: {ImportCategories(pShopContext,categoriesJson)}");
 
-           //var categoryProductsJson = File.ReadAllText(@"../../../Datasets/categories-products.json");
-           //Console.WriteLine($"category-products imported: {ImportCategoryProducts(pShopContext,categoryProductsJson)}");
+            //var categoryProductsJson = File.ReadAllText(@"../../../Datasets/categories-products.json");
+            //Console.WriteLine($"category-products imported: {ImportCategoryProducts(pShopContext,categoryProductsJson)}");
 
-            Console.WriteLine(GetProductsInRange(pShopContext));
+            //Console.WriteLine(GetProductsInRange(pShopContext));
+            Console.WriteLine(GetSoldProducts(pShopContext));
 
         }
 
+
+        //06
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+            var users = context.Users
+
+                .Where(u => u.ProductsSold.Any(x => x.BuyerId != null))
+                .Select(x => new
+                {
+                    firstName = x.FirstName,
+                    lastName = x.LastName,
+                    soldProducts = x.ProductsSold.Where(y => y.BuyerId != null).Select(y => new
+                    {
+                        name = y.Name,
+                        price = y.Price,
+                        buyerFirstName = y.Buyer.FirstName,
+                        buyerLastName = y.Buyer.LastName
+                    })
+                })
+                .OrderBy(x => x.lastName)
+                .ThenBy(x => x.firstName)
+                .ToList();
+            var usersJson = JsonConvert.SerializeObject(users);
+            return usersJson;
+        }
 
         //05
         public static string GetProductsInRange(ProductShopContext context)
@@ -52,7 +78,7 @@ namespace ProductShop
                 })
                 .OrderBy(x => x.price)
                 .ToList();
-            ;
+
             var productsJson = JsonConvert.SerializeObject(products);
             return productsJson;
 
