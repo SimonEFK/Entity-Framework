@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using ProductShop.Data;
 using ProductShop.DataTransferObject;
 using ProductShop.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProductShop
 {
@@ -34,7 +35,56 @@ namespace ProductShop
 
             //Console.WriteLine(GetProductsInRange(pShopContext));
             //Console.WriteLine(GetSoldProducts(pShopContext));
-           // Console.WriteLine(GetCategoriesByProductsCount(pShopContext));
+            // Console.WriteLine(GetCategoriesByProductsCount(pShopContext));
+            Console.WriteLine(GetUsersWithProducts(pShopContext));
+
+
+
+        }
+
+        //08
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+
+            var users = context.Users
+                .Include(x=>x.ProductsSold)
+                .Where(x => x.ProductsSold.Any(y => y.BuyerId != null))
+                .ToList()                
+                .Select(x => new
+                {
+                    firstName = x.FirstName,
+                    lastName = x.LastName,
+                    age = x.Age,
+                    soldProducts = new
+                    {
+                        count = x.ProductsSold.Where(y=>y.BuyerId!=null).Count(),
+                        products = x.ProductsSold
+                        .Where(y => y.BuyerId != null)
+                        .Select(y => new
+                        {
+                            name = y.Name,
+                            price = y.Price
+
+                        }).ToList()
+
+                    }
+                })
+                .OrderByDescending(x => x.soldProducts.count);
+
+            var result = new
+            {
+                usersCount = users.Count(),
+                users = users
+
+
+            };
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore,
+            };
+            var usersJson = JsonConvert.SerializeObject(result, jsonSettings);
+            return usersJson;
 
 
 
@@ -48,15 +98,20 @@ namespace ProductShop
                 {
                     category = c.Name,
                     productsCount = c.CategoryProducts.Count(),
-                    averagePrice = c.CategoryProducts.Average(x=>x.Product.Price).ToString("F2"),
-                    totalRevenue = c.CategoryProducts.Sum(x=>x.Product.Price).ToString("F2")
+                    averagePrice = c.CategoryProducts.Average(x => x.Product.Price).ToString("F2"),
+                    totalRevenue = c.CategoryProducts.Sum(x => x.Product.Price).ToString("F2")
 
 
 
                 })
                 .OrderByDescending(x => x.productsCount)
                 .ToList();
-            var categoriesJson = JsonConvert.SerializeObject(categories,Formatting.Indented);
+
+            var jsonOptions = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+            };
+            var categoriesJson = JsonConvert.SerializeObject(categories, Formatting.Indented, jsonOptions);
             return categoriesJson;
 
 
