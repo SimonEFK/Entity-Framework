@@ -15,11 +15,16 @@ namespace CarDealer
         public static void Main(string[] args)
         {
             var carDealerContext = new CarDealerContext();
-            ResetDatabase(carDealerContext);
+            //ResetDatabase(carDealerContext);
 
-            var importSuppliersJson = File.ReadAllText(@"../../../Datasets/suppliers.json");
+            //var importSuppliersJson = File.ReadAllText(@"../../../Datasets/suppliers.json");
 
-            Console.WriteLine(ImportSuppliers(carDealerContext, importSuppliersJson));
+            //Console.WriteLine(ImportSuppliers(carDealerContext, importSuppliersJson));
+
+            var importPartsJson = File.ReadAllText(@"../../../Datasets/parts.json");
+
+            Console.WriteLine(ImportParts(carDealerContext, importPartsJson));
+
 
         }
 
@@ -50,9 +55,36 @@ namespace CarDealer
             var suppliers = mapper.Map<IEnumerable<Supplier>>(suppliersDesereliazed);
             context.Suppliers.AddRange(suppliers);
             context.SaveChanges();
-            ;
+
 
             return $"Successfully imported {suppliers.Count()}.";
+
+        }
+
+
+
+
+
+        public static string ImportParts(CarDealerContext context, string inputJson)
+        {
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+
+            };
+            var partsDesereliazed = JsonConvert.DeserializeObject<IEnumerable<Part>>(inputJson);
+
+            var validSuppliers = context.Suppliers.Select(x => x.Id).ToList();
+            var validParts = partsDesereliazed.Where(x => validSuppliers.Contains(x.SupplierId)).ToList() ;
+            
+            context.AddRange(validParts);
+            context.SaveChanges();
+
+            return $"Successfully imported {validParts.Count()}.";
+
+
+
 
         }
     }
