@@ -20,9 +20,29 @@ namespace CarDealer
         {
             var carDealerContext = new CarDealerContext();
             //ResetDatabase(carDealerContext);
-            Console.WriteLine(GetOrderedCustomers(carDealerContext));
+            Console.WriteLine(GetCarsFromMakeToyota(carDealerContext));
 
 
+        }
+
+
+        public static string GetCarsFromMakeToyota(CarDealerContext context)
+        {
+            var carMake = "Toyota";
+
+            var cars = context.Cars.Where(x => x.Make.ToUpper() == carMake.ToUpper()).Select(x => new
+            {
+                x.Id,
+                x.Make,
+                x.Model,
+                x.TravelledDistance,
+            })
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TravelledDistance)
+                .ToList();
+            var jsonCarsExport = JsonConvert.SerializeObject(cars, Formatting.Indented);
+
+            return jsonCarsExport;
         }
         public static string GetOrderedCustomers(CarDealerContext context)
         {
@@ -31,12 +51,12 @@ namespace CarDealer
                 .ThenBy(c => c.IsYoungDriver)
                 .Select(c => new CustomersDtoExport
                 {
-                 Name = c.Name,
-                 BirthDate = c.BirthDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
-                 IsYoungDriver = c.IsYoungDriver,
-                 
+                    Name = c.Name,
+                    BirthDate = c.BirthDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                    IsYoungDriver = c.IsYoungDriver,
+
                 })
-               
+
                 .ToList();
 
             var jsonExport = JsonConvert.SerializeObject(customers, Formatting.Indented);
