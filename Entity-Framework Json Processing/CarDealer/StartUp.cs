@@ -20,13 +20,57 @@ namespace CarDealer
         {
             var carDealerContext = new CarDealerContext();
             //ResetDatabase(carDealerContext);
-            Console.WriteLine(GetLocalSuppliers(carDealerContext));
+            Console.WriteLine(GetTotalSalesByCustomer(carDealerContext));
 
 
         }
 
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+
+            var customers = context.Customers.Where(x => x.Sales.Count > 0)
+                .Select(customer => new
+                {
+                    fullName = customer.Name,
+                    boughtCars = customer.Sales.Count,
+                    spentMoney = customer.Sales.Select(c=>c.Car).SelectMany(pc=>pc.PartCars).Sum(p=>p.Part.Price)
 
 
+                })
+                .ToList()
+                .OrderByDescending(x=>x.spentMoney)
+                .ThenByDescending(c=>c.boughtCars);
+
+            var customersJsonExport = JsonConvert.SerializeObject(customers,Formatting.Indented);
+
+            return customersJsonExport;
+
+        }
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var cars = context.Cars.Select(x => new
+            {
+                car = new
+                {
+                    x.Make,
+                    x.Model,
+                    x.TravelledDistance,
+
+                },
+                parts = x.PartCars.Select(p => new
+                {
+                    p.Part.Name,
+                    Price = p.Part.Price.ToString("F2"),
+                })
+
+
+            })
+            .ToList();
+
+            var carsJsonExport = JsonConvert.SerializeObject(cars, Formatting.Indented);
+            return carsJsonExport;
+
+        }
         public static string GetLocalSuppliers(CarDealerContext context)
         {
 
@@ -36,7 +80,7 @@ namespace CarDealer
                 x.Name,
                 PartsCount = x.Parts.Count
             }).ToList();
-            var suppliersJsonExport = JsonConvert.SerializeObject(suppliers,Formatting.Indented);
+            var suppliersJsonExport = JsonConvert.SerializeObject(suppliers, Formatting.Indented);
             return suppliersJsonExport;
 
 
