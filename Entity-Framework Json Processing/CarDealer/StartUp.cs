@@ -20,7 +20,25 @@ namespace CarDealer
         {
             var carDealerContext = new CarDealerContext();
             //ResetDatabase(carDealerContext);
-            Console.WriteLine(GetCarsFromMakeToyota(carDealerContext));
+            Console.WriteLine(GetLocalSuppliers(carDealerContext));
+
+
+        }
+
+
+
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+
+            var suppliers = context.Suppliers.Where(x => x.IsImporter == false).Select(x => new
+            {
+                x.Id,
+                x.Name,
+                PartsCount = x.Parts.Count
+            }).ToList();
+            var suppliersJsonExport = JsonConvert.SerializeObject(suppliers,Formatting.Indented);
+            return suppliersJsonExport;
+
 
 
         }
@@ -63,14 +81,6 @@ namespace CarDealer
 
             return jsonExport;
         }
-
-
-
-
-
-
-
-
         private static void Seed(CarDealerContext dbContext)
         {
             var importSuppliersJson = File.ReadAllText(@"./Datasets/suppliers.json");
