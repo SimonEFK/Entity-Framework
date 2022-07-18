@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YQCvlywkX6WC5Rm62FuJPmM/UjM1WDswXaExpi4SxNHehfJSR+vDee0X0N57iksHhz5zN8f0uJ7LwYXg9/2ILg==",
+  "dgSpecHash": "rsWZbhj3AlkNjRCgiT+X/kQzL9TLHDjjp6mnL0sYXiyXD0vHlXA9HuP5MuIWLAZy2rso+MmB1UnkxxD6Sv+RkA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\simon\\Desktop\\New folder (5)\\CarDealer\\CarDealer.csproj",
+  "projectFilePath": "C:\\Users\\simon\\Desktop\\Json Processing\\Car Dealer\\CarDealer\\CarDealer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\simon\\.nuget\\packages\\automapper\\7.0.1\\automapper.7.0.1.nupkg.sha512",
     "C:\\Users\\simon\\.nuget\\packages\\castle.core\\4.2.1\\castle.core.4.2.1.nupkg.sha512",

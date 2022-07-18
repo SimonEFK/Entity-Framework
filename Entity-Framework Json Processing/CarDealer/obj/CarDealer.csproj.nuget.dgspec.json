@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\simon\\Desktop\\New folder (5)\\CarDealer\\CarDealer.csproj": {}
+    "C:\\Users\\simon\\Desktop\\Json Processing\\Car Dealer\\CarDealer\\CarDealer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\simon\\Desktop\\New folder (5)\\CarDealer\\CarDealer.csproj": {
+    "C:\\Users\\simon\\Desktop\\Json Processing\\Car Dealer\\CarDealer\\CarDealer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\simon\\Desktop\\New folder (5)\\CarDealer\\CarDealer.csproj",
+        "projectUniqueName": "C:\\Users\\simon\\Desktop\\Json Processing\\Car Dealer\\CarDealer\\CarDealer.csproj",
         "projectName": "CarDealer",
-        "projectPath": "C:\\Users\\simon\\Desktop\\New folder (5)\\CarDealer\\CarDealer.csproj",
+        "projectPath": "C:\\Users\\simon\\Desktop\\Json Processing\\Car Dealer\\CarDealer\\CarDealer.csproj",
         "packagesPath": "C:\\Users\\simon\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\simon\\Desktop\\New folder (5)\\CarDealer\\obj\\",
+        "outputPath": "C:\\Users\\simon\\Desktop\\Json Processing\\Car Dealer\\CarDealer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\simon\\AppData\\Roaming\\NuGet\\NuGet.Config",
