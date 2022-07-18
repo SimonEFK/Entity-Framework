@@ -8,8 +8,10 @@ namespace CarDealer.DTO
     public class SuppliersDto
     {
 
+        [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("isImporter")]
         public bool IsImporter { get; set; }
 
     }
