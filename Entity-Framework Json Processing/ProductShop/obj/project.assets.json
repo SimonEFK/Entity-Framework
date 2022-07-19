@@ -5401,11 +5401,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\simon\\Desktop\\JSON Exercise Product Skelet\\ProductShop\\ProductShop.csproj",
+      "projectUniqueName": "C:\\Users\\simon\\Desktop\\Json Processing\\Product Shop\\ProductShop\\ProductShop.csproj",
       "projectName": "ProductShop",
-      "projectPath": "C:\\Users\\simon\\Desktop\\JSON Exercise Product Skelet\\ProductShop\\ProductShop.csproj",
+      "projectPath": "C:\\Users\\simon\\Desktop\\Json Processing\\Product Shop\\ProductShop\\ProductShop.csproj",
       "packagesPath": "C:\\Users\\simon\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\simon\\Desktop\\JSON Exercise Product Skelet\\ProductShop\\obj\\",
+      "outputPath": "C:\\Users\\simon\\Desktop\\Json Processing\\Product Shop\\ProductShop\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\simon\\AppData\\Roaming\\NuGet\\NuGet.Config",

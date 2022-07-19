@@ -13,34 +13,15 @@ namespace ProductShop
 {
     public class StartUp
     {
+        private const string ImportSuccsesfulyMessage = "Successfully imported {0}.";
         public static void Main(string[] args)
         {
 
             var pShopContext = new ProductShopContext();
-            // ResetDatabase(pShopContext);
-
-
-
-            //var usersJson = File.ReadAllText(@"../../../Datasets/users.json");
-            //Console.WriteLine($"Users imported: {ImportUsers(pShopContext,usersJson)}");
-
-            //var productJson = File.ReadAllText(@"../../../Datasets/products.json");
-            //Console.WriteLine($"Products imported: {ImportProducts(pShopContext, productJson)}");
-
-            //var categoriesJson = File.ReadAllText(@"../../../Datasets/categories.json");
-            //Console.WriteLine($"Categories imported: {ImportCategories(pShopContext,categoriesJson)}");
-
-            //var categoryProductsJson = File.ReadAllText(@"../../../Datasets/categories-products.json");
-            //Console.WriteLine($"category-products imported: {ImportCategoryProducts(pShopContext,categoryProductsJson)}");
-
-            //Console.WriteLine(GetProductsInRange(pShopContext));
-            //Console.WriteLine(GetSoldProducts(pShopContext));
-            // Console.WriteLine(GetCategoriesByProductsCount(pShopContext));
-            Console.WriteLine(GetUsersWithProducts(pShopContext));
-
-
+            //ResetDatabase(pShopContext);
 
         }
+       
 
         //08
         public static string GetUsersWithProducts(ProductShopContext context)
@@ -89,7 +70,6 @@ namespace ProductShop
 
 
         }
-
         //07
         public static string GetCategoriesByProductsCount(ProductShopContext context)
         {
@@ -116,7 +96,6 @@ namespace ProductShop
 
 
         }
-
         //06
         public static string GetSoldProducts(ProductShopContext context)
         {
@@ -141,7 +120,6 @@ namespace ProductShop
             var usersJson = JsonConvert.SerializeObject(users);
             return usersJson;
         }
-
         //05
         public static string GetProductsInRange(ProductShopContext context)
         {
@@ -171,10 +149,10 @@ namespace ProductShop
             ;
             context.CategoryProducts.AddRange(categoriesProducs);
             context.SaveChanges();
-            return $"Successfully imported {categoriesProducs.Count()}";
+
+            return string.Format(ImportSuccsesfulyMessage, categoriesProducs.Count());
+         
         }
-
-
         //03
         public static string ImportCategories(ProductShopContext context, string inputJson)
         {
@@ -187,10 +165,8 @@ namespace ProductShop
             context.Categories.AddRange(categories);
             context.SaveChanges();
 
-
-            return $"Successfully imported {categories.Count()}";
+            return string.Format(ImportSuccsesfulyMessage, categories.Count());
         }
-
         //02
         public static string ImportProducts(ProductShopContext context, string inputJson)
         {
@@ -201,7 +177,7 @@ namespace ProductShop
             context.SaveChanges();
             ;
 
-            return $"Successfully imported {products.Count()}";
+            return string.Format(ImportSuccsesfulyMessage,products.Count());
         }
         //01
         public static string ImportUsers(ProductShopContext context, string inputJson)
@@ -212,9 +188,12 @@ namespace ProductShop
             context.Users.AddRange(users);
             context.SaveChanges();
 
-            return $"Successfully imported {users.Count()}";
+            return string.Format(ImportSuccsesfulyMessage, users.Count());
+            
         }
-        //miscellaneous
+
+
+        
         private static IMapper initializeMapper()
         {
             var config = new MapperConfiguration(cfg =>
@@ -224,12 +203,26 @@ namespace ProductShop
             IMapper mapper = config.CreateMapper();
             return mapper;
         }
+        private static void Seed(ProductShopContext productShopContext)
+        {
+            var usersJson = File.ReadAllText(@"./Datasets/users.json");
+            var productJson = File.ReadAllText(@"./Datasets/products.json");
+            var categoriesJson = File.ReadAllText(@"./Datasets/categories.json");
+            var categoryProductsJson = File.ReadAllText(@"./Datasets/categories-products.json");
+
+            Console.WriteLine($"Users imported: {ImportUsers(productShopContext, usersJson)}");
+            Console.WriteLine($"Products imported: {ImportProducts(productShopContext, productJson)}");
+            Console.WriteLine($"Categories imported: {ImportCategories(productShopContext, categoriesJson)}");
+            Console.WriteLine($"Category-Products imported: {ImportCategoryProducts(productShopContext, categoryProductsJson)}");
+        }
         private static void ResetDatabase(ProductShopContext pShopContext)
         {
             pShopContext.Database.EnsureDeleted();
             Console.WriteLine("db Deleted");
             pShopContext.Database.EnsureCreated();
             Console.WriteLine("db Created");
+
+            Seed(pShopContext);
         }
     }
 }

@@ -11,3 +11,20 @@ C:\Users\simon\Desktop\JSON Exercise Product Skelet\ProductShop\obj\Debug\netcor
 C:\Users\simon\Desktop\JSON Exercise Product Skelet\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.dll
 C:\Users\simon\Desktop\JSON Exercise Product Skelet\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.pdb
 C:\Users\simon\Desktop\JSON Exercise Product Skelet\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.genruntimeconfig.cache
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\Datasets\categories-products.json
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\Datasets\categories.json
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\Datasets\products.json
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\Datasets\users.json
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.deps.json
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.runtimeconfig.json
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.runtimeconfig.dev.json
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.dll
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.pdb
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.csproj.AssemblyReference.cache
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.AssemblyInfoInputs.cache
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.AssemblyInfo.cs
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.csproj.CoreCompileInputs.cache
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.dll
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.pdb
+C:\Users\simon\Desktop\Json Processing\Product Shop\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.genruntimeconfig.cache
