@@ -17,11 +17,15 @@ namespace ProductShop
         {
 
 
-            var ProductShopContext = new ProductShopContext();
-            ResetDatabase(ProductShopContext);
+            var productShopContext = new ProductShopContext();
+            //ResetDatabase(ProductShopContext);
 
-            
-            
+
+            var productsXml = File.ReadAllText(@"./Datasets/products.xml");
+            Console.WriteLine(ImportProducts(productShopContext, productsXml));
+
+
+
         }
 
         private static void ResetDatabase(ProductShopContext ProductShopContext)
@@ -39,14 +43,18 @@ namespace ProductShop
         {
             var usersXml = File.ReadAllText(@"./Datasets/users.xml");
 
+            var productsXml = File.ReadAllText(@"./Datasets/products.xml");
 
 
-            Console.WriteLine($"Import users {ImportUsers(productShopContext,usersXml)}");
-                
+
+
+            Console.WriteLine($"Import users {ImportUsers(productShopContext, usersXml)}");
+            Console.WriteLine($"Import products {ImportProducts(productShopContext, productsXml)}");
 
 
         }
 
+        //01
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
 
@@ -67,8 +75,37 @@ namespace ProductShop
 
             context.Users.AddRange(users);
             context.SaveChanges();
-            
-            return string.Format(SuccsefullyImportMessage,users.Length);
+
+            return string.Format(SuccsefullyImportMessage, users.Length);
+        }
+        //02
+        public static string ImportProducts(ProductShopContext context, string inputXml)
+        {
+            var root = new XmlRootAttribute("Products");
+
+            var stringReader = new StringReader(inputXml);
+
+            var sereliazer = new XmlSerializer(typeof(ProductsInputModel[]), root);
+
+            var productsDto = sereliazer.Deserialize(stringReader) as ProductsInputModel[];
+
+            var validUsersId = context.Users.Select(x => x.Id).ToArray();
+
+            var products = productsDto.Where(x => validUsersId.Contains(x.SellerId)).Select(x => new Product
+            {
+                Name = x.Name,
+                Price = x.Price,
+                SellerId = x.SellerId,
+                BuyerId = x.BuyerId,
+
+            }).ToArray();
+            context.Products.AddRange(products);
+            context.SaveChanges();
+
+
+
+            return string.Format(SuccsefullyImportMessage, products.Length);
+
         }
     }
 
