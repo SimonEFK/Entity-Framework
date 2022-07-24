@@ -21,8 +21,8 @@ namespace ProductShop
             //ResetDatabase(ProductShopContext);
 
 
-            var productsXml = File.ReadAllText(@"./Datasets/products.xml");
-            Console.WriteLine(ImportProducts(productShopContext, productsXml));
+            var categoriesXml = File.ReadAllText(@"./Datasets/categories.xml");
+            Console.WriteLine(ImportCategories(productShopContext, categoriesXml));
 
 
 
@@ -42,14 +42,15 @@ namespace ProductShop
         private static void Seed(ProductShopContext productShopContext)
         {
             var usersXml = File.ReadAllText(@"./Datasets/users.xml");
-
             var productsXml = File.ReadAllText(@"./Datasets/products.xml");
-
+            var categoriesXml = File.ReadAllText(@"./Datasets/categories.xml");
+            
 
 
 
             Console.WriteLine($"Import users {ImportUsers(productShopContext, usersXml)}");
             Console.WriteLine($"Import products {ImportProducts(productShopContext, productsXml)}");
+            Console.WriteLine($"Import categories {ImportCategories(productShopContext, categoriesXml)}");
 
 
         }
@@ -106,6 +107,29 @@ namespace ProductShop
 
             return string.Format(SuccsefullyImportMessage, products.Length);
 
+        }
+        //03
+        public static string ImportCategories(ProductShopContext context, string inputXml)
+        {
+            var root = new XmlRootAttribute("Categories");
+
+            var stringReader = new StringReader(inputXml);
+
+            var sereliazer = new XmlSerializer(typeof(CategoriesInputModel[]), root);
+
+            var categoriesDto = sereliazer.Deserialize(stringReader) as CategoriesInputModel[];
+
+            var categories = categoriesDto.Select(x => new Category
+            {
+                Name = x.Name,
+            }).ToArray();
+
+            context.Categories.AddRange(categories);
+            context.SaveChanges();
+
+
+
+            return string.Format(SuccsefullyImportMessage,categories.Length);
         }
     }
 
