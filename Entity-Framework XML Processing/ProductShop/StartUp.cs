@@ -2,6 +2,7 @@
 using ProductShop.DataTransferObjects.Import;
 using ProductShop.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -18,11 +19,11 @@ namespace ProductShop
 
 
             var productShopContext = new ProductShopContext();
-            //ResetDatabase(ProductShopContext);
+            //ResetDatabase(productShopContext);
 
 
-            var categoriesXml = File.ReadAllText(@"./Datasets/categories.xml");
-            Console.WriteLine(ImportCategories(productShopContext, categoriesXml));
+            var categoriesProductsXml = File.ReadAllText(@"./Datasets/categories-products.xml");
+            Console.WriteLine(ImportCategoryProducts(productShopContext, categoriesProductsXml));
 
 
 
@@ -44,13 +45,13 @@ namespace ProductShop
             var usersXml = File.ReadAllText(@"./Datasets/users.xml");
             var productsXml = File.ReadAllText(@"./Datasets/products.xml");
             var categoriesXml = File.ReadAllText(@"./Datasets/categories.xml");
-            
-
+            var categoriesProductsXml = File.ReadAllText(@"./Datasets/categories-products.xml");
 
 
             Console.WriteLine($"Import users {ImportUsers(productShopContext, usersXml)}");
             Console.WriteLine($"Import products {ImportProducts(productShopContext, productsXml)}");
             Console.WriteLine($"Import categories {ImportCategories(productShopContext, categoriesXml)}");
+            Console.WriteLine($"Import categories-products {ImportCategoryProducts(productShopContext, categoriesProductsXml)}");
 
 
         }
@@ -129,7 +130,44 @@ namespace ProductShop
 
 
 
-            return string.Format(SuccsefullyImportMessage,categories.Length);
+            return string.Format(SuccsefullyImportMessage, categories.Length);
+        }
+        //04
+        public static string ImportCategoryProducts(ProductShopContext context, string inputXml)
+        {
+
+            var root = new XmlRootAttribute("CategoryProducts");
+
+            var stringReader = new StringReader(inputXml);
+
+            var sereliazer = new XmlSerializer(typeof(CategoriesProductsInputModel[]), root);
+
+            var categoriesProductsDto = sereliazer.Deserialize(stringReader) as CategoriesProductsInputModel[];
+
+
+            var validProducsId = context.Products.Select(x => x.Id).ToArray();
+            var validCategories = context.Categories.Select(x => x.Id).ToArray();
+
+            var categoryProducts = new List<CategoryProduct>();
+
+            foreach (var item in categoriesProductsDto)
+            {
+                if ((validProducsId.Contains(item.ProductId) == false) || (validCategories.Contains(item.CategoryId) == false))
+                {
+                    continue;
+
+                }
+
+                categoryProducts.Add(new CategoryProduct
+                {
+                    ProductId = item.ProductId,
+                    CategoryId = item.CategoryId,
+                });
+            }
+            context.CategoryProducts.AddRange(categoryProducts);
+            context.SaveChanges();
+
+            return string.Format(SuccsefullyImportMessage, categoryProducts.Count);
         }
     }
 
