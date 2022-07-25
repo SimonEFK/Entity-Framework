@@ -1,4 +1,6 @@
-﻿using ProductShop.Data;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using ProductShop.Data;
 using ProductShop.DataTransferObjects.Export;
 using ProductShop.DataTransferObjects.Import;
 using ProductShop.Models;
@@ -15,6 +17,15 @@ namespace ProductShop
 
     public class StartUp
     {
+        private static IMapper initializeMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<ProductShopProfile>();
+            });
+            IMapper mapper = config.CreateMapper();
+            return mapper;
+        }
         private const string SuccsefullyImportMessage = "Successfully imported {0}";
         public static void Main(string[] args)
         {
@@ -22,7 +33,7 @@ namespace ProductShop
 
             var productShopContext = new ProductShopContext();
             //ResetDatabase(productShopContext);
-            Console.WriteLine(GetProductsInRange(productShopContext));
+            Console.WriteLine(GetSoldProducts(productShopContext));
 
 
 
@@ -180,7 +191,7 @@ namespace ProductShop
             {
                 Name = x.Name,
                 Price = x.Price,
-                Buyer = x.Buyer.FirstName+' '+x.Buyer.LastName,
+                Buyer = x.Buyer.FirstName + ' ' + x.Buyer.LastName,
             })
                 .OrderBy(x => x.Price)
                 .Take(10)
@@ -190,27 +201,53 @@ namespace ProductShop
 
             var rootAttribute = new XmlRootAttribute("Products");
             var emptyNameSpace = new XmlSerializerNamespaces();
-            emptyNameSpace.Add(string.Empty,string.Empty);
+            emptyNameSpace.Add(string.Empty, string.Empty);
 
             var sb = new StringBuilder();
             var stringWriter = new StringWriter(sb);
 
             var serializer = new XmlSerializer(typeof(ProductsExportModel[]), rootAttribute);
-            serializer.Serialize(stringWriter, products,emptyNameSpace);
+            serializer.Serialize(stringWriter, products, emptyNameSpace);
 
-            
+
             return sb.ToString();
         }
 
         //05
         public static string GetSoldProducts(ProductShopContext context)
         {
+            var mapper = initializeMapper();
+            var products = context.Users.Where(x => x.ProductsSold.Count > 0)
+                .ProjectTo<UsersExportModel>(mapper.ConfigurationProvider)
+                //.Select(x => new UsersExportModel
+                //{
+                //    FirstName = x.FirstName,
+                //    LastName = x.LastName,
+                //    ProductsSold = x.ProductsSold.Select(p => new ProductsSoldExportModel
+                //    {
+                //        Name = p.Name,
+                //        Price = p.Price,
+                //    }).ToArray()
+                //})
+                .OrderBy(user => user.LastName)
+                .ThenBy(user => user.FirstName)
+                .Take(5)
+                .ToArray();
 
 
 
+            var rootAttribute = new XmlRootAttribute("Users");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+
+            var sb = new StringBuilder();
+            var stringWriter = new StringWriter(sb);
+
+            var serializer = new XmlSerializer(typeof(UsersExportModel[]), rootAttribute);
+            serializer.Serialize(stringWriter, products, emptyNameSpace);
 
 
-            return null;
+            return sb.ToString();
         }
     }
 
