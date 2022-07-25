@@ -11,6 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using ProductShop.DataTransferObjects.Export.ExportUsersProducts;
+using UsersExportModel = ProductShop.DataTransferObjects.Export.UsersExportModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProductShop
 {
@@ -33,7 +36,7 @@ namespace ProductShop
 
             var productShopContext = new ProductShopContext();
             //ResetDatabase(productShopContext);
-            Console.WriteLine(GetSoldProducts(productShopContext));
+            Console.WriteLine(GetUsersWithProducts(productShopContext));
 
 
 
@@ -213,7 +216,7 @@ namespace ProductShop
             return sb.ToString();
         }
 
-        //05
+        //06
         public static string GetSoldProducts(ProductShopContext context)
         {
             var mapper = initializeMapper();
@@ -248,6 +251,89 @@ namespace ProductShop
 
 
             return sb.ToString();
+        }
+
+        //07
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var mapper = initializeMapper();
+            var categories = context.Categories
+                .ProjectTo<CategoriesExportModel>(mapper.ConfigurationProvider)
+                .OrderByDescending(x => x.Count)
+                .ThenBy(x => x.TotalRevenue)
+                .ToArray();
+
+
+            var rootAttribute = new XmlRootAttribute("Categories");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+
+            //var sb = new StringBuilder();
+            var stringWriter = new StringWriter();
+
+            var serializer = new XmlSerializer(typeof(CategoriesExportModel[]), rootAttribute);
+            serializer.Serialize(stringWriter, categories, emptyNameSpace);
+            stringWriter.Dispose();
+
+            return stringWriter.ToString();
+
+        }
+
+        //08
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+
+            var users = context.Users.Where(u => u.ProductsSold.Count > 0)
+                .Include(x=>x.ProductsSold)
+                .ToArray() 
+                
+                .OrderByDescending(u=>u.ProductsSold.Count)
+                .Take(10)
+                .Select(x => new UsersExportModel2
+                {
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Age = x.Age,
+                    ProductsSold = new SoldProducts
+                    {
+                        Count = x.ProductsSold.Count,
+                        Products = x.ProductsSold.Select(p => new ProductSold
+                        {
+                            Name = p.Name,
+                            Price = p.Price,
+                        })
+                        .OrderByDescending(pr => pr.Price)
+                        .ToArray()
+
+
+
+
+                    }
+                })
+                .ToArray();
+                
+
+            var result = new UserProductsCount
+            {
+                Count = context.Users.Count(u => u.ProductsSold.Count > 0),
+                Users = users.ToArray()
+            };
+
+
+
+            var rootAttribute = new XmlRootAttribute("Users");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+
+            //var sb = new StringBuilder();
+            var stringWriter = new StringWriter();
+
+            var serializer = new XmlSerializer(typeof(UserProductsCount), rootAttribute);
+            serializer.Serialize(stringWriter, result, emptyNameSpace);
+            stringWriter.Dispose();
+
+            return stringWriter.ToString();
+
         }
     }
 
