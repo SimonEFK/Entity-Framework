@@ -1,10 +1,12 @@
 ﻿using ProductShop.Data;
+using ProductShop.DataTransferObjects.Export;
 using ProductShop.DataTransferObjects.Import;
 using ProductShop.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
@@ -20,10 +22,7 @@ namespace ProductShop
 
             var productShopContext = new ProductShopContext();
             //ResetDatabase(productShopContext);
-
-
-            var categoriesProductsXml = File.ReadAllText(@"./Datasets/categories-products.xml");
-            Console.WriteLine(ImportCategoryProducts(productShopContext, categoriesProductsXml));
+            Console.WriteLine(GetProductsInRange(productShopContext));
 
 
 
@@ -168,6 +167,50 @@ namespace ProductShop
             context.SaveChanges();
 
             return string.Format(SuccsefullyImportMessage, categoryProducts.Count);
+        }
+
+        //05
+        public static string GetProductsInRange(ProductShopContext context)
+        {
+
+            var minRange = 500;
+            var maxRange = 1000;
+
+            var products = context.Products.Where(x => x.Price >= minRange && x.Price <= maxRange).Select(x => new ProductsExportModel
+            {
+                Name = x.Name,
+                Price = x.Price,
+                Buyer = x.Buyer.FirstName+' '+x.Buyer.LastName,
+            })
+                .OrderBy(x => x.Price)
+                .Take(10)
+                .ToArray();
+
+
+
+            var rootAttribute = new XmlRootAttribute("Products");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty,string.Empty);
+
+            var sb = new StringBuilder();
+            var stringWriter = new StringWriter(sb);
+
+            var serializer = new XmlSerializer(typeof(ProductsExportModel[]), rootAttribute);
+            serializer.Serialize(stringWriter, products,emptyNameSpace);
+
+            
+            return sb.ToString();
+        }
+
+        //05
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+
+
+
+
+
+            return null;
         }
     }
 
