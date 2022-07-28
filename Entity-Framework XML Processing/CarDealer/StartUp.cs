@@ -1,5 +1,5 @@
 ﻿using CarDealer.Data;
-using CarDealer.DataTransferObject.Import;
+using CarDealer.Dtos.Import;
 using CarDealer.Models;
 using System;
 using System.IO;
@@ -17,6 +17,38 @@ namespace CarDealer
             
             ResetDatabase(db);
 
+        }
+
+
+        //10
+
+        public static string ImportParts(CarDealerContext context, string inputXml)
+        {
+            var root = new XmlRootAttribute("Parts");
+            var xmlSerializer = new XmlSerializer(typeof(PartXmlModel[]),root);
+            var sr = new StringReader(inputXml);
+            var partsDto = xmlSerializer.Deserialize(sr) as PartXmlModel[];
+
+            var validSuppliers = context.Suppliers.Select(x=>x.Id).ToList();
+
+            var parts = partsDto.Where(x => validSuppliers.Contains(x.SupplierId) == true)
+                .Select(x => new Part
+                {
+                    
+                    Name = x.Name,
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                    SupplierId = x.SupplierId,
+
+
+                }).ToArray();
+            context.AddRange(parts);
+            context.SaveChanges();
+
+            
+
+
+            return string.Format(ImportMessage, parts.Length);
         }
 
         //09
@@ -53,9 +85,11 @@ namespace CarDealer
         private static void Seed(CarDealerContext context)
         {
             var suppliersXml = File.ReadAllText(@".\Datasets\suppliers.xml");
+            var partsXml = File.ReadAllText(@".\Datasets\parts.xml");
+            
 
-
-            Console.WriteLine($"Import Suppliers{ImportSuppliers(context, suppliersXml)}");
+            Console.WriteLine($"Import Suppliers:{ImportSuppliers(context, suppliersXml)}");
+            Console.WriteLine($"Import Parts:{ImportParts(context, partsXml)}");
         }
     }
 }

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace CarDealer.DataTransferObject.Import
+namespace CarDealer.Dtos.Import
 {
     [XmlType("Supplier")]
     public class SupplierXmlModel
     {
         [XmlElement("name")]
-        public string  Name { get; set; }
+        public string Name { get; set; }
         [XmlElement("isImporter")]
         public bool IsImporter { get; set; }
     }
