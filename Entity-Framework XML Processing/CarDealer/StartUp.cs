@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace CarDealer
@@ -16,11 +17,65 @@ namespace CarDealer
         {
             var db = new CarDealerContext();
 
-            ResetDatabase(db);
-           
+            //ResetDatabase(db);
+            Console.WriteLine(GetCarsWithDistance(db));
+
+
 
         }
+        //14
+        public static string GetCarsWithDistance(CarDealerContext context)
+        {
 
+            var maxDistance = 2_000_000;
+
+            var cars = context.Cars
+                .Where(c => c.TravelledDistance > maxDistance)
+                .Select(x => new CarXmlExportModel
+                {
+                    Make = x.Make,
+                    Model = x.Model,
+                    TraveledDistance = x.TravelledDistance
+
+                })
+                .OrderBy(x => x.Make)
+                .ThenBy(x => x.Model)
+                .Take(10)
+                .ToArray();
+
+            var xmlSerializer = new XmlSerializer(typeof(CarXmlExportModel[]), new XmlRootAttribute("cars"));
+
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+            using var sw = new StringWriter();
+
+            xmlSerializer.Serialize(sw,cars,emptyNameSpace);
+
+
+
+            return sw.ToString();
+        }
+        //13
+        public static string ImportSales(CarDealerContext context, string inputXml)
+        {
+
+            var xmlSerializer = new XmlSerializer(typeof(SaleXmlModel[]), new XmlRootAttribute("Sales"));
+
+            var salesDto = xmlSerializer.Deserialize(new StringReader(inputXml)) as SaleXmlModel[];
+            var validCarIds = context.Cars.Select(x => x.Id).ToList();
+
+            var sales = salesDto.Where(x => validCarIds.Contains(x.CarId)).Select(x => new Sale
+            {
+                CarId = x.CarId,
+                CustomerId = x.CustomerId,
+                Discount = x.Discount,
+            }).ToArray();
+
+            context.Sales.AddRange(sales);
+            context.SaveChanges();
+            return string.Format(ImportMessage, sales.Length);
+
+        }
         //12
         public static string ImportCustomers(CarDealerContext context, string inputXml)
         {
@@ -144,14 +199,14 @@ namespace CarDealer
             var partsXml = File.ReadAllText(@".\Datasets\parts.xml");
             var carsXml = File.ReadAllText(@".\Datasets\cars.xml");
             var customersXml = File.ReadAllText(@".\Datasets\customers.xml");
-
-
+            var salesXml = File.ReadAllText(@".\Datasets\sales.xml");
 
 
             Console.WriteLine($"Import Suppliers:{ImportSuppliers(context, suppliersXml)}");
             Console.WriteLine($"Import Parts:{ImportParts(context, partsXml)}");
             Console.WriteLine($"Import Cars:{ImportCars(context, carsXml)}");
             Console.WriteLine($"Import Customers:{ImportCustomers(context, customersXml)}");
+            Console.WriteLine($"Import Sales:{ImportSales(context, salesXml)}");
         }
     }
 }
