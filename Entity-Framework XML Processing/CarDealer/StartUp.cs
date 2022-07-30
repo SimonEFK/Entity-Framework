@@ -19,16 +19,42 @@ namespace CarDealer
             var db = new CarDealerContext();
 
             //ResetDatabase(db);
+            Console.WriteLine(GetLocalSuppliers(db));
+
+
+
+
+        }
+        //16
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            var suppliers = context.Suppliers.Where(x => x.IsImporter == false)
+                .Select(x => new SuppliersXmlExport
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PartsCount = x.Parts.Count
+                })
+                .ToArray();
+
+            var root = new XmlRootAttribute("suppliers");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+            var xmlSerializer = new XmlSerializer(typeof(SuppliersXmlExport[]),root);
+            using var sw = new StringWriter();
+            xmlSerializer.Serialize(sw, suppliers,emptyNameSpace);
+            return sw.ToString();
+
+
+
+
            
-
-
-
         }
         //15
         public static string GetCarsFromMakeBmw(CarDealerContext context)
         {
             var cars = context.Cars
-                .Where(x => x.Make == "BMW")                
+                .Where(x => x.Make == "BMW")
                 .Select(x => new CarSpecificMakeXmlExport
                 {
                     Id = x.Id,
@@ -37,8 +63,8 @@ namespace CarDealer
 
 
                 })
-                .OrderBy(x=>x.Model)
-                .ThenByDescending(x=>x.TravelledDistance)
+                .OrderBy(x => x.Model)
+                .ThenByDescending(x => x.TravelledDistance)
                 .ToArray();
             var xmlSerializer = new XmlSerializer(typeof(CarSpecificMakeXmlExport[]), new XmlRootAttribute("cars"));
             var emptyNameSpace = new XmlSerializerNamespaces();
