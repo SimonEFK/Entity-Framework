@@ -19,8 +19,71 @@ namespace CarDealer
             var db = new CarDealerContext();
 
             //ResetDatabase(db);
-            Console.WriteLine(GetCarsWithTheirListOfParts(db));
+            Console.WriteLine(GetTotalSalesByCustomer(db));
 
+
+
+
+        }
+
+        //18
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+
+            var customers = context.Customers.Where(x => x.Sales.Count > 0).Select(x => new TotalSalesByCustomerXmlExport
+            {
+                FullName = x.Name,
+                BoughtCars = x.Sales.Count,
+                MoneySpent = x.Sales.Select(c => c.Car).SelectMany(cp => cp.PartCars).Sum(x => x.Part.Price)
+            })
+                .OrderByDescending(x=>x.MoneySpent)
+                .ToArray();
+
+            var root = new XmlRootAttribute("customers");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+            var xmlSerializer = new XmlSerializer(typeof(TotalSalesByCustomerXmlExport[]), root);
+            using var sw = new StringWriter();
+            xmlSerializer.Serialize(sw, customers, emptyNameSpace);
+            return sw.ToString();
+
+
+
+            
+        }
+        //17
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+
+            var cars = context.Cars
+                .Select(x => new CarAndCarPartsXmlExport
+                {
+                    Make = x.Make,
+                    Model = x.Model,
+                    TravelledDistance = x.TravelledDistance,
+                    Parts = x.PartCars
+                    .Select(p => new CarPartsXmlExport
+                    {
+                        Name = p.Part.Name,
+                        Price = p.Part.Price
+
+
+                    })
+                    .OrderByDescending(p => p.Price)
+                    .ToArray()
+                })
+                .OrderByDescending(c => c.TravelledDistance)
+                .ThenBy(x => x.Model)
+                .Take(5)
+                .ToArray();
+
+            var root = new XmlRootAttribute("cars");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+            var xmlSerializer = new XmlSerializer(typeof(CarAndCarPartsXmlExport[]), root);
+            using var sw = new StringWriter();
+            xmlSerializer.Serialize(sw, cars, emptyNameSpace);
+            return sw.ToString();
 
 
 
@@ -46,43 +109,6 @@ namespace CarDealer
             return sw.ToString();
 
 
-
-
-
-        }
-        //17
-        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
-        {
-
-            var cars = context.Cars
-                .Select(x => new CarAndCarPartsXmlExport
-                {
-                    Make = x.Make,
-                    Model = x.Model,
-                    TravelledDistance = x.TravelledDistance,
-                    Parts = x.PartCars
-                    .Select(p => new CarPartsXmlExport
-                    {
-                        Name = p.Part.Name,
-                        Price = p.Part.Price
-
-
-                    })
-                    .OrderByDescending(p => p.Price)
-                    .ToArray()
-                })
-                .OrderByDescending(c => c.TravelledDistance)
-                .ThenBy(x=>x.Model)
-                .Take(5)
-                .ToArray();
-
-            var root = new XmlRootAttribute("cars");
-            var emptyNameSpace = new XmlSerializerNamespaces();
-            emptyNameSpace.Add(string.Empty, string.Empty);
-            var xmlSerializer = new XmlSerializer(typeof(CarAndCarPartsXmlExport[]), root);
-            using var sw = new StringWriter();
-            xmlSerializer.Serialize(sw, cars, emptyNameSpace);
-            return sw.ToString();
 
 
 
