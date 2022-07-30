@@ -1,4 +1,5 @@
 ﻿using CarDealer.Data;
+using CarDealer.Dtos.Export;
 using CarDealer.Dtos.Import;
 using CarDealer.Models;
 using System;
@@ -18,10 +19,35 @@ namespace CarDealer
             var db = new CarDealerContext();
 
             //ResetDatabase(db);
-            Console.WriteLine(GetCarsWithDistance(db));
+           
 
 
 
+        }
+        //15
+        public static string GetCarsFromMakeBmw(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Where(x => x.Make == "BMW")                
+                .Select(x => new CarSpecificMakeXmlExport
+                {
+                    Id = x.Id,
+                    Model = x.Model,
+                    TravelledDistance = x.TravelledDistance,
+
+
+                })
+                .OrderBy(x=>x.Model)
+                .ThenByDescending(x=>x.TravelledDistance)
+                .ToArray();
+            var xmlSerializer = new XmlSerializer(typeof(CarSpecificMakeXmlExport[]), new XmlRootAttribute("cars"));
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+
+            using var sw = new StringWriter();
+            xmlSerializer.Serialize(sw, cars, emptyNameSpace);
+
+            return sw.ToString();
         }
         //14
         public static string GetCarsWithDistance(CarDealerContext context)
@@ -49,7 +75,7 @@ namespace CarDealer
             emptyNameSpace.Add(string.Empty, string.Empty);
             using var sw = new StringWriter();
 
-            xmlSerializer.Serialize(sw,cars,emptyNameSpace);
+            xmlSerializer.Serialize(sw, cars, emptyNameSpace);
 
 
 
