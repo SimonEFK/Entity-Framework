@@ -19,7 +19,7 @@ namespace CarDealer
             var db = new CarDealerContext();
 
             //ResetDatabase(db);
-            Console.WriteLine(GetLocalSuppliers(db));
+            Console.WriteLine(GetCarsWithTheirListOfParts(db));
 
 
 
@@ -40,15 +40,52 @@ namespace CarDealer
             var root = new XmlRootAttribute("suppliers");
             var emptyNameSpace = new XmlSerializerNamespaces();
             emptyNameSpace.Add(string.Empty, string.Empty);
-            var xmlSerializer = new XmlSerializer(typeof(SuppliersXmlExport[]),root);
+            var xmlSerializer = new XmlSerializer(typeof(SuppliersXmlExport[]), root);
             using var sw = new StringWriter();
-            xmlSerializer.Serialize(sw, suppliers,emptyNameSpace);
+            xmlSerializer.Serialize(sw, suppliers, emptyNameSpace);
             return sw.ToString();
 
 
 
 
-           
+
+        }
+        //17
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+
+            var cars = context.Cars
+                .Select(x => new CarAndCarPartsXmlExport
+                {
+                    Make = x.Make,
+                    Model = x.Model,
+                    TravelledDistance = x.TravelledDistance,
+                    Parts = x.PartCars
+                    .Select(p => new CarPartsXmlExport
+                    {
+                        Name = p.Part.Name,
+                        Price = p.Part.Price
+
+
+                    })
+                    .OrderByDescending(p => p.Price)
+                    .ToArray()
+                })
+                .OrderByDescending(c => c.TravelledDistance)
+                .ThenBy(x=>x.Model)
+                .Take(5)
+                .ToArray();
+
+            var root = new XmlRootAttribute("cars");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+            var xmlSerializer = new XmlSerializer(typeof(CarAndCarPartsXmlExport[]), root);
+            using var sw = new StringWriter();
+            xmlSerializer.Serialize(sw, cars, emptyNameSpace);
+            return sw.ToString();
+
+
+
         }
         //15
         public static string GetCarsFromMakeBmw(CarDealerContext context)
