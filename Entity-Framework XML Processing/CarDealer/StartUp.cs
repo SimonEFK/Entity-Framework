@@ -19,10 +19,44 @@ namespace CarDealer
             var db = new CarDealerContext();
 
             //ResetDatabase(db);
-            Console.WriteLine(GetTotalSalesByCustomer(db));
+            Console.WriteLine(GetSalesWithAppliedDiscount(db));
 
 
 
+
+        }
+
+        //19
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+
+            var customers = context.Sales
+                .Select(x => new SalesWithAppliedDiscount
+                {
+                    CarSaleExportModel = new CarSaleXmlExportModel
+                    {
+                        Make = x.Car.Make,
+                        Model = x.Car.Model,
+                        TravelledDistance = x.Car.TravelledDistance,
+
+                    },
+                    Discount = x.Discount,
+                    FullName = x.Customer.Name,
+                    Price = x.Car.PartCars.Sum(x => x.Part.Price),
+                    PriceWithDiscount = x.Car.PartCars.Sum(x => x.Part.Price) - x.Car.PartCars.Sum(x => x.Part.Price) * x.Discount / 100M
+
+
+
+                }).ToArray();
+
+
+            var root = new XmlRootAttribute("sales");
+            var emptyNameSpace = new XmlSerializerNamespaces();
+            emptyNameSpace.Add(string.Empty, string.Empty);
+            var xmlSerializer = new XmlSerializer(typeof(SalesWithAppliedDiscount[]), root);
+            using var sw = new StringWriter();
+            xmlSerializer.Serialize(sw, customers, emptyNameSpace);
+            return sw.ToString();
 
         }
 
@@ -36,7 +70,7 @@ namespace CarDealer
                 BoughtCars = x.Sales.Count,
                 MoneySpent = x.Sales.Select(c => c.Car).SelectMany(cp => cp.PartCars).Sum(x => x.Part.Price)
             })
-                .OrderByDescending(x=>x.MoneySpent)
+                .OrderByDescending(x => x.MoneySpent)
                 .ToArray();
 
             var root = new XmlRootAttribute("customers");
@@ -49,7 +83,7 @@ namespace CarDealer
 
 
 
-            
+
         }
         //17
         public static string GetCarsWithTheirListOfParts(CarDealerContext context)
